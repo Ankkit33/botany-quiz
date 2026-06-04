@@ -147,3 +147,61 @@ console.log(err);
 
 }
 
+async function loadLeaderboard(){
+
+try{
+
+const response = await fetch(WEBAPP_URL);
+const data = await response.json();
+
+let html = `
+
+<div style="
+background:white;
+padding:20px;
+border-radius:15px;
+margin-top:20px;
+">
+
+<h2>🏆 Top 15 Rankers</h2>
+
+<table style="
+width:100%;
+border-collapse:collapse;
+">
+
+<tr>
+<th>Rank</th>
+<th>Name</th>
+<th>Score</th>
+</tr>
+`;
+
+data.forEach((row,index)=>{
+
+html += `
+
+<tr>
+<td>${index+1}</td>
+<td>${row[0]}</td>
+<td>${row[2]}</td>
+</tr>
+`;
+
+});
+
+html += `
+
+</table>
+</div>
+`;
+
+document.getElementById("leaderboard").innerHTML = html;
+
+}catch(err){
+
+console.log(err);
+
+}
+
+}
