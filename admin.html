@@ -9,28 +9,39 @@
 
 <style>
 
-body{
+*{
 margin:0;
-font-family:Segoe UI,sans-serif;
-background:linear-gradient(135deg,#c8f7a6,#8fdc7f);
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',sans-serif;
+}
+
+body{
+background:linear-gradient(135deg,#d4fc79,#96e6a1);
+min-height:100vh;
+padding:30px;
 }
 
 .header{
 background:#1b5e20;
 color:white;
-padding:20px;
+padding:25px;
+border-radius:20px;
 text-align:center;
 font-size:32px;
 font-weight:bold;
+box-shadow:0 10px 25px rgba(0,0,0,.15);
 }
 
-.container{
-max-width:1200px;
-margin:30px auto;
-padding:20px;
+.sub{
+text-align:center;
+margin-top:10px;
+color:#444;
+font-size:18px;
 }
 
 .grid{
+margin-top:30px;
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
 gap:20px;
@@ -41,31 +52,43 @@ background:white;
 padding:25px;
 border-radius:20px;
 box-shadow:0 10px 25px rgba(0,0,0,.1);
+transition:.3s;
+}
+
+.card:hover{
+transform:translateY(-5px);
 }
 
 .card h2{
-margin-top:0;
 color:#1b5e20;
+margin-bottom:10px;
 }
 
 .stat{
-font-size:40px;
+font-size:45px;
 font-weight:bold;
 color:#2e7d32;
 }
 
 .btn{
 display:inline-block;
-margin-top:10px;
+margin-top:15px;
 padding:12px 20px;
 background:#2e7d32;
 color:white;
 text-decoration:none;
 border-radius:10px;
+font-weight:bold;
 }
 
 .btn:hover{
 background:#1b5e20;
+}
+
+.footer{
+margin-top:40px;
+text-align:center;
+color:#444;
 }
 
 </style>
@@ -78,7 +101,9 @@ background:#1b5e20;
 🌿 Botany Admin Dashboard
 </div>
 
-<div class="container">
+<div class="sub">
+Developer Portal • CSIR NET • CUET PG • GATE Preparation
+</div>
 
 <div class="grid">
 
@@ -93,12 +118,12 @@ background:#1b5e20;
 </div>
 
 <div class="card">
-<h2>Average Score</h2>
+<h2>Top Score</h2>
 <div class="stat">0</div>
 </div>
 
 <div class="card">
-<h2>Top Score</h2>
+<h2>Average Score</h2>
 <div class="stat">0</div>
 </div>
 
@@ -106,11 +131,11 @@ background:#1b5e20;
 <h2>Practice Mode</h2>
 
 <p>
-Topic-wise quizzes and revision.
+Start solving quizzes for your preparation.
 </p>
 
 <a href="index.html" class="btn">
-Start Practice
+Start Quiz
 </a>
 
 </div>
@@ -119,7 +144,7 @@ Start Practice
 <h2>Question Bank</h2>
 
 <p>
-Manage CSIR NET, CUET PG and GATE questions.
+Manage and expand question database.
 </p>
 
 <a href="#" class="btn">
@@ -130,8 +155,9 @@ Coming Soon
 
 </div>
 
+<div class="footer">
+🚀 Developed by Ankit • Botany Quiz Portal
 </div>
 
 </body>
 </html>
-
