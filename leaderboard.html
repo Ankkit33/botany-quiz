@@ -58,19 +58,21 @@
 
     async function getLeaderboard() {
         const rollNumber = document.getElementById('rollInput').value.trim();
-        
-        // This attaches your action to the web script link
         const finalUrl = `${MY_APPS_SCRIPT_URL}?action=getPublicLeaderboard&rollNumber=${encodeURIComponent(rollNumber)}`;
         
         try {
             const response = await fetch(finalUrl);
             const data = await response.json();
             
-            if (data.status === "success") {
+            // Ab ye data.status check karega jo naye Apps Script mein bheja hai
+            if (data && data.status === "success") {
                 displayTable(data.leaderboard);
                 displayIndividualRank(data.searchedStudent, rollNumber);
+            } else if (Array.isArray(data)) {
+                // Agar galti se purana data aaye toh handling
+                displayTable(data);
             } else {
-                alert("Could not load data: " + data.message);
+                alert("Could not load data from sheet.");
             }
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -80,27 +82,34 @@
 
     function displayTable(studentsList) {
         const tbody = document.getElementById('tableRows');
-        tbody.innerHTML = ""; // Clear out the loading text
+        tbody.innerHTML = ""; 
         
-        if (studentsList.length === 0) {
+        if (!studentsList || studentsList.length === 0) {
             tbody.innerHTML = "<tr><td colspan='4' style='text-align:center;'>No scores recorded yet!</td></tr>";
             return;
         }
 
-        studentsList.forEach(student => {
+        studentsList.forEach((student, index) => {
             const row = document.createElement('tr');
             
-            // Adding fun medals to top positions
-            let rankBadge = student.rank;
-            if (student.rank === 1) rankBadge = "🥇 1";
-            if (student.rank === 2) rankBadge = "🥈 2";
-            if (student.rank === 3) rankBadge = "🥉 3";
+            // Agar apps script se rank nahi aayi toh khud index se nikalega
+            let currentRank = student.rank || (index + 1);
+            let rankBadge = currentRank;
+            
+            if (currentRank === 1) rankBadge = "🥇 1";
+            if (currentRank === 2) rankBadge = "🥈 2";
+            if (currentRank === 3) rankBadge = "🥉 3";
+            
+            // Purane data aur naye data dono ke name/score variables check karega
+            let name = student.name || student[0] || "Unknown";
+            let score = (student.score !== undefined) ? student.score : (student[2] !== undefined ? student[2] : 0);
+            let accuracy = student.accuracy || 0;
             
             row.innerHTML = `
-                <td class="${student.rank <= 3 ? 'top-three' : ''}">${rankBadge}</td>
-                <td>${student.name}</td>
-                <td>${student.score}</td>
-                <td>${Number(student.accuracy).toFixed(1)}%</td>
+                <td class="${currentRank <= 3 ? 'top-three' : ''}">${rankBadge}</td>
+                <td>${name}</td>
+                <td>${score}</td>
+                <td>${Number(accuracy).toFixed(1)}%</td>
             `;
             tbody.appendChild(row);
         });
@@ -123,7 +132,7 @@
         }
     }
 
-    // This automatically runs the script as soon as the page opens to load the Top 15
+    // Isko pehli baar bina roll number ke load karne ke liye
     window.onload = function() {
         getLeaderboard();
     };
