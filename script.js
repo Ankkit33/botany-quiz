@@ -2,7 +2,6 @@ const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzcsKzw1l7KY1koFxHO0
 
 let timeLeft = 900;
 let timer;
-let startTime;
 
 function startQuiz(){
 
@@ -16,8 +15,6 @@ return;
 
 document.getElementById("studentForm").style.display="none";
 document.getElementById("quizSection").style.display="block";
-
-startTime = Date.now();
 
 loadQuestions();
 startTimer();
@@ -42,6 +39,7 @@ submitQuiz();
 }
 
 },1000);
+
 }
 
 function loadQuestions(){
@@ -56,9 +54,7 @@ html += `
 
 <p><b>${index+1}. ${q.question}</b></p>
 
-${q.options.map((opt,i)=>`<label> <input type="radio"
-name="q${index}"
-value="${i}">
+${q.options.map((opt,i)=>`<label> <input type="radio" name="q${index}" value="${i}">
 ${opt} </label><br>`).join("")}
 
 </div>
@@ -67,6 +63,7 @@ ${opt} </label><br>`).join("")}
 });
 
 document.getElementById("questionsContainer").innerHTML = html;
+
 }
 
 async function submitQuiz(){
@@ -78,9 +75,7 @@ let score = 0;
 questions.forEach((q,index)=>{
 
 const selected =
-document.querySelector(
-'input[name="q'+index+'"]:checked'
-);
+document.querySelector('input[name="q'+index+'"]:checked');
 
 if(selected &&
 parseInt(selected.value)===q.answer){
@@ -90,15 +85,13 @@ score++;
 });
 
 const total = questions.length;
-
 const correct = score;
 const wrong = total-score;
 
 const accuracy =
 ((score/total)*100).toFixed(2);
 
-const secondsTaken =
-900-timeLeft;
+const secondsTaken = 900-timeLeft;
 
 const minutes =
 Math.floor(secondsTaken/60);
@@ -109,19 +102,28 @@ secondsTaken%60;
 const timeTaken =
 minutes+"m "+seconds+"s";
 
-document.getElementById("quizSection").innerHTML = `
+document.getElementById("result").innerHTML = `
 
-<h2>Quiz Submitted</h2>
+<div style="
+background:white;
+padding:20px;
+border-radius:15px;
+margin-top:20px;
+">
 
-<p><b>Score:</b> ${score}/${total}</p>
+<h2>🎉 Quiz Completed</h2>
 
-<p><b>Correct:</b> ${correct}</p>
+<p><b>🏆 Score:</b> ${score}/${total}</p>
 
-<p><b>Wrong:</b> ${wrong}</p>
+<p><b>✅ Correct:</b> ${correct}</p>
 
-<p><b>Accuracy:</b> ${accuracy}%</p>
+<p><b>❌ Wrong:</b> ${wrong}</p>
 
-<p><b>Time Taken:</b> ${timeTaken}</p>
+<p><b>📊 Accuracy:</b> ${accuracy}%</p>
+
+<p><b>⏱ Time Taken:</b> ${timeTaken}</p>
+
+</div>
 `;
 
 const payload = {
@@ -138,6 +140,8 @@ await fetch(WEBAPP_URL,{
 method:"POST",
 body:JSON.stringify(payload)
 });
+
+loadLeaderboard();
 
 }catch(err){
 
@@ -205,3 +209,5 @@ console.log(err);
 }
 
 }
+
+loadLeaderboard();
