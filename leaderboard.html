@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Botany Department Leaderboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f7f4; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h2 { color: #2e6f40; text-align: center; }
+        .search-box { background: #eef5f0; padding: 15px; border-radius: 6px; margin-bottom: 25px; text-align: center; border: 1px solid #d0e1d4; }
+        .search-box input { padding: 10px; width: 60%; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; }
+        .search-box button { padding: 10px 20px; font-size: 16px; background-color: #2e6f40; color: white; border: none; border-radius: 4px; cursor: pointer; margin-left: 10px; }
+        .search-box button:hover { background-color: #21502e; }
+        .rank-card { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 15px; border-radius: 6px; margin-bottom: 25px; font-size: 18px; text-align: center; display: none; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #2e6f40; color: white; font-weight: bold; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .top-three { font-weight: bold; color: #2e6f40; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Botany Department Quiz Leaderboard</h2>
+    
+    <div class="search-box">
+        <strong>Check Your Specific Rank: </strong>
+        <input type="text" id="rollInput" placeholder="Enter your Roll Number exactly...">
+        <button onclick="getLeaderboard()">Search</button>
+    </div>
+
+    <div id="rankResultCard" class="rank-card"></div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Student Name</th>
+                <th>Score Achieved</th>
+                <th>Accuracy (%)</th>
+            </tr>
+        </thead>
+        <tbody id="tableRows">
+            <tr>
+                <td colspan="4" style="text-align: center; color: #777;">Loading performance records...</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // -------------------------------------------------------------
+    // CONFIGURATION: REPLACE THE URL BELOW WITH YOUR APPS SCRIPT URL
+    // -------------------------------------------------------------
+    const MY_APPS_SCRIPT_URL = "https://script.google.com/macros/s/YOUR_ACTUAL_EXEC_URL_HERE/exec";
+
+    async function getLeaderboard() {
+        const rollNumber = document.getElementById('rollInput').value.trim();
+        
+        // This attaches your action to the web script link
+        const finalUrl = `${MY_APPS_SCRIPT_URL}?action=getPublicLeaderboard&rollNumber=${encodeURIComponent(rollNumber)}`;
+        
+        try {
+            const response = await fetch(finalUrl);
+            const data = await response.json();
+            
+            if (data.status === "success") {
+                displayTable(data.leaderboard);
+                displayIndividualRank(data.searchedStudent, rollNumber);
+            } else {
+                alert("Could not load data: " + data.message);
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+            alert("Connection to Google Sheet failed.");
+        }
+    }
+
+    function displayTable(studentsList) {
+        const tbody = document.getElementById('tableRows');
+        tbody.innerHTML = ""; // Clear out the loading text
+        
+        if (studentsList.length === 0) {
+            tbody.innerHTML = "<tr><td colspan='4' style='text-align:center;'>No scores recorded yet!</td></tr>";
+            return;
+        }
+
+        studentsList.forEach(student => {
+            const row = document.createElement('tr');
+            
+            // Adding fun medals to top positions
+            let rankBadge = student.rank;
+            if (student.rank === 1) rankBadge = "🥇 1";
+            if (student.rank === 2) rankBadge = "🥈 2";
+            if (student.rank === 3) rankBadge = "🥉 3";
+            
+            row.innerHTML = `
+                <td class="${student.rank <= 3 ? 'top-three' : ''}">${rankBadge}</td>
+                <td>${student.name}</td>
+                <td>${student.score}</td>
+                <td>${Number(student.accuracy).toFixed(1)}%</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function displayIndividualRank(studentResult, searchedRoll) {
+        const card = document.getElementById('rankResultCard');
+        
+        if (!searchedRoll) {
+            card.style.display = "none";
+            return;
+        }
+        
+        card.style.display = "block";
+        if (studentResult) {
+            card.innerHTML = `Results for Roll Number <strong>${searchedRoll.toUpperCase()}</strong>: <br> 
+                              Your Overall Rank is: <strong>#${studentResult.rank}</strong> | Score: ${studentResult.score}`;
+        } else {
+            card.innerHTML = `No submission data found for Roll Number: <strong>${searchedRoll.toUpperCase()}</strong>`;
+        }
+    }
+
+    // This automatically runs the script as soon as the page opens to load the Top 15
+    window.onload = function() {
+        getLeaderboard();
+    };
+</script>
+</body>
+</html>
